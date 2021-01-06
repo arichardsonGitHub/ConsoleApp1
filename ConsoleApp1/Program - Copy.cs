@@ -9,39 +9,46 @@ namespace AsyncBreakfast
         static async Task Main(string[] args)
         {
             PourCoffee();
-
+            Console.WriteLine("coffee is ready");
 
             var eggsTask = FryEggsAsync(2);
             var baconTask = FryBaconAsync(3);
             var toastTask = MakeToastWithButterAndJamAsync(2);
 
 
-            
+
             var breakfastTasks = new List<Task> { eggsTask, baconTask, toastTask };
 
-            await Task.WhenAll(breakfastTasks);
+
+
+
+            while (breakfastTasks.Count > 0)
+            {
+                var finishedTask = await Task.WhenAny(breakfastTasks);
+
+                if (finishedTask == eggsTask)
+                {
+                    Console.WriteLine("eggs are ready");
+                }
+                else if (finishedTask == baconTask)
+                {
+                    Console.WriteLine("bacon is ready");
+                }
+                else if (finishedTask == toastTask)
+                {
+                    Console.WriteLine("toast is ready");
+                }
+
+                breakfastTasks.Remove(finishedTask);
+            }
 
             PourOJ();
+            Console.WriteLine("oj is ready");
+
+
 
             Console.WriteLine("Breakfast is ready!");
         }
-        private static void PourCoffee()
-        {         
-            Console.WriteLine("Pouring coffee");
-
-            System.Threading.Thread.Sleep(10000);
-
-            Console.WriteLine("Coffee is ready");
-        }
-        private static void PourOJ()
-        {
-            Console.WriteLine("Pouring orange juice");
-
-            System.Threading.Thread.Sleep(10000);
-
-            Console.WriteLine("OJ is ready");
-        }
-
 
         static async Task<Toast> MakeToastWithButterAndJamAsync(int number)
         {
@@ -50,6 +57,12 @@ namespace AsyncBreakfast
             ApplyJam(toast);
 
             return toast;
+        }
+
+        private static Juice PourOJ()
+        {
+            Console.WriteLine("Pouring orange juice");
+            return new Juice();
         }
 
         private static void ApplyJam(Toast toast) =>
@@ -65,7 +78,7 @@ namespace AsyncBreakfast
                 Console.WriteLine("Putting a slice of bread in the toaster");
             }
             Console.WriteLine("Start toasting...");
-            await Task.Delay(2000);
+            await Task.Delay(10000);
             Console.WriteLine("Remove toast from toaster");
 
             return new Toast();
@@ -75,13 +88,13 @@ namespace AsyncBreakfast
         {
             Console.WriteLine($"putting {slices} slices of bacon in the pan");
             Console.WriteLine("cooking first side of bacon...");
-            await Task.Delay(25000);
+            await Task.Delay(10000);
             for (int slice = 0; slice < slices; slice++)
             {
                 Console.WriteLine("flipping a slice of bacon");
             }
             Console.WriteLine("cooking the second side of bacon...");
-            await Task.Delay(24000);
+            await Task.Delay(10000);
             Console.WriteLine("Put bacon on plate");
 
             return new Bacon();
@@ -90,13 +103,35 @@ namespace AsyncBreakfast
         private static async Task<Egg> FryEggsAsync(int howMany)
         {
             Console.WriteLine("Warming the egg pan...");
-            await Task.Delay(1000);
+            await Task.Delay(10000);
             Console.WriteLine($"cracking {howMany} eggs");
             Console.WriteLine("cooking the eggs ...");
-            await Task.Delay(1000);
+            await Task.Delay(10000);
             Console.WriteLine("Put eggs on plate");
 
             return new Egg();
+        }
+
+        private static async Task<int> PlayVanHalenAsync()
+        {
+            Console.WriteLine("Walking over to Spotify");
+            await Task.Delay(10000);
+
+            Console.WriteLine("Turning on Van Halen on Spotify");
+
+            Console.WriteLine("Walking back to kitchen");
+            await Task.Delay(10000);
+
+
+            return 5150;
+        }
+
+        private static Coffee PourCoffee()
+        {
+            Task.Delay(10000);
+
+            Console.WriteLine("Pouring coffee");
+            return new Coffee();
         }
     }
 
